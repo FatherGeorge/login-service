@@ -31,7 +31,7 @@ public class LoginControllerTest {
     @Test
     public void loginReturnsNotFoundIfProfessorNotInDb() throws Exception {
         // Setup
-        final LoginInfo request = new LoginInfo("Euler", "2.72");
+        final Login request = new Login("James", "123");
 
         // Execute
         final String actualStringResponse = mockMvc.perform(post("/login")
@@ -46,6 +46,27 @@ public class LoginControllerTest {
         // Assert
         assertThat(actualResponse, allOf(hasProperty("statusCode", is("-1")),
                                          hasProperty("statusDescription", is("Account not found"))
+        ));
+    }
+
+    @Test
+    public void loginReturnsLoginSuccessfulProfessorInDb() throws Exception {
+        // Setup
+        final Login request = new Login("Euler", "2.72");
+
+        // Execute
+        final String actualStringResponse = mockMvc.perform(post("/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(OBJECT_MAPPER.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        LoginResponse actualResponse = OBJECT_MAPPER.readValue(actualStringResponse, LoginResponse.class);
+
+        // Assert
+        assertThat(actualResponse, allOf(hasProperty("statusCode", is("1")),
+                hasProperty("statusDescription", is("Login successful"))
         ));
     }
 }

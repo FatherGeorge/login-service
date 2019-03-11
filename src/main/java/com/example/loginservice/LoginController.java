@@ -11,14 +11,19 @@ import java.util.Optional;
 @RestController
 final class LoginController {
 
-    Map<String, LoginInfo> stubRepository = new HashMap<>();
+    Map<String, Login> stubRepository = new HashMap<>();
     {
-        stubRepository.put("Euler", new LoginInfo("Euler", "2.27"));
+        stubRepository.put("Euler", new Login("Euler", "2.72"));
     }
 
     @PostMapping("/login")
-    LoginResponse login(@RequestBody Optional<LoginInfo> request) {
-
+    LoginResponse login(@RequestBody Optional<Login> request) {
+        if(request.isPresent()) {
+            Login login = request.get();
+            Login actualLogin = stubRepository.get(login.getName());
+            if (actualLogin != null && actualLogin.getPassword().equals(login.getPassword()))
+                return new LoginResponse("1", "Login successful");
+        }
         return new LoginResponse("-1", "Account not found");
     }
 }
